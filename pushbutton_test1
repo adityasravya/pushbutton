@@ -1,1 +1,30 @@
-Add your code here
+const byte button = D2;  //connect the pushbutton on digital pin D2
+const byte led = D0;      //connect the led on D0
+int  counter = 0;         //initialize a counter
+int previous = 0;         //initialize a variable
+byte  state = 0;          //initialize a state
+void ICACHE_RAM_ATTR ISRoutine ();     //attach the RAM ATTRIBUTE ISR
+
+void setup() 
+{
+  Serial.begin(115200);     //set the baudrate
+  pinMode(button, INPUT);   //set the button as input
+  pinMode(led, HIGH);       //set the led as output
+  attachInterrupt(digitalPinToInterrupt(button), ISRoutine, RISING);    //attach the interrupt
+}
+
+void loop() 
+{
+  if(state != previous)
+  {
+    previous = state;
+    counter++;                    //Increase the counter after every changes of pushbutton
+    Serial.println(counter);      //print the counter
+  }
+  
+}
+void ISRoutine()      //create a function where interrupt check the state of push button
+{
+  state =! state;
+}
+ 
