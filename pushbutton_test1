@@ -1,1 +1,64 @@
-Add your code here
+const int button = D2;    ////connect the pushbutton on digital pin D2
+int buttonState = 0;     // current state of the button
+int lastButtonState = 0; // previous state of the button
+int startPressed = 0;    // the moment the button was pressed
+int endPressed = 0;      // the moment the button was released
+int holdTime = 0;        // how long the button was hold
+float holdTime1 = 0;     //hold time
+int idleTime = 0;        // how long the button was idle
+
+int  counter = 0;         //initialize a counter
+int previous = 0;         //initialize a variable
+byte  state = 0;          //initialize a state
+void ICACHE_RAM_ATTR ISRoutine ();
+
+
+void setup() {
+  pinMode(button, INPUT); // initialize the button pin as a input
+  Serial.begin(115200);        // initialize serial communication
+  attachInterrupt(digitalPinToInterrupt(button), ISRoutine, RISING);    //attach the interrupt
+
+}
+
+void loop() {
+
+  if(state != previous)
+  {
+    previous = state;
+    counter++;
+    Serial.print("counter = ");
+    Serial.println(counter);      //print the counter
+  }
+  
+  buttonState = digitalRead(button); // read the button input
+  
+  if (buttonState != lastButtonState) { // button state changed
+     updateState();
+  }
+
+  lastButtonState = buttonState;        // save state for next loop
+}
+
+void updateState() {
+  // the button has been just released
+  if (buttonState == HIGH) {
+      endPressed = millis();
+      Serial.print("end time = ");
+      Serial.println(endPressed);
+      holdTime = (endPressed - startPressed);
+      holdTime1 = holdTime*0.001;
+      Serial.print("hold time1 = ");
+      Serial.println(holdTime1);
+
+  // the button has been just pressed
+  } else {
+        startPressed = millis();
+        Serial.print("start_time = ");
+        Serial.println(startPressed);
+  }
+}
+
+void ISRoutine()      //create a function where interrupt check the state of push button
+{
+  state =! state;
+}
